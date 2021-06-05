@@ -3,7 +3,7 @@
 ## TGNet and TGModule(A GCN Module, based on GloRe)
 
 ### TGMoudle(based on GloRe)
-![Figure 1: TGModule](https://github.com/Junelin2333/TGNet/blob/main/misc/TGModule.png)
+<img style="width:50%;height:50%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/TGModule.png" alt="Figure 1: TGMoudle" align=center />
 ### TGNet
 ![Figure 2: TGNet](https://github.com/Junelin2333/TGNet/blob/main/misc/TGN.png){:height="50%" width="50%"}
 ### GloRe-Net(as baseline)
