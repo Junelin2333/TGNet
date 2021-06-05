@@ -1,4 +1,5 @@
-# TGNet: Image Semantic Segmentation Based on Graph Convolution Nerual Network
+# TGNet
+# Image Semantic Segmentation Based on Graph Convolution Nerual Network
 
 ## TGNet and TGModule(A GCN Module, based on GloRe)
 
