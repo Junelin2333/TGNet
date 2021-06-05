@@ -1,291 +1,146 @@
+from fcn import FCN8s
 import tensorflow as tf
-from tensorflow.keras.applications import ResNet101V2
-from ade20k_dataset import ADE20kDataset
-from pcontext_dataset import PascalContextDataset
 import os
 import cv2
 import numpy as np
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
-class UpdatedMeanIoU(tf.keras.metrics.MeanIoU):
-    def __init__(self,
-                 y_true=None,
-                 y_pred=None,
-                 num_classes=None,
-                 name='mean_iou',
-                 dtype=None):
-        super(UpdatedMeanIoU, self).__init__(num_classes=num_classes,
-                                             name=name,
-                                             dtype=dtype)
-
-    def update_state(self, y_true, y_pred, sample_weight=None):
-        y_pred = tf.math.argmax(y_pred, axis=-1)
-        return super().update_state(y_true, y_pred, sample_weight)
-
-def create_visual_annotation(anno):
-    """"""
-    # assert np.max(anno) <= 7, "only 7 classes are supported, add new color in label2color_dict"
-    label2color_array = np.asarray(
-    [
-      [0, 0, 0],
-      [120, 120, 120],
-      [180, 120, 120],
-      [6, 230, 230],
-      [80, 50, 50],
-      [4, 200, 3],
-      [120, 120, 80],
-      [140, 140, 140],
-      [204, 5, 255],
-      [230, 230, 230],
-      [4, 250, 7],
-      [224, 5, 255],
-      [235, 255, 7],
-      [150, 5, 61],
-      [120, 120, 70],
-      [8, 255, 51],
-      [255, 6, 82],
-      [143, 255, 140],
-      [204, 255, 4],
-      [255, 51, 7],
-      [204, 70, 3],
-      [0, 102, 200],
-      [61, 230, 250],
-      [255, 6, 51],
-      [11, 102, 255],
-      [255, 7, 71],
-      [255, 9, 224],
-      [9, 7, 230],
-      [220, 220, 220],
-      [255, 9, 92],
-      [112, 9, 255],
-      [8, 255, 214],
-      [7, 255, 224],
-      [255, 184, 6],
-      [10, 255, 71],
-      [255, 41, 10],
-      [7, 255, 255],
-      [224, 255, 8],
-      [102, 8, 255],
-      [255, 61, 6],
-      [255, 194, 7],
-      [255, 122, 8],
-      [0, 255, 20],
-      [255, 8, 41],
-      [255, 5, 153],
-      [6, 51, 255],
-      [235, 12, 255],
-      [160, 150, 20],
-      [0, 163, 255],
-      [140, 140, 140],
-      [250, 10, 15],
-      [20, 255, 0],
-      [31, 255, 0],
-      [255, 31, 0],
-      [255, 224, 0],
-      [153, 255, 0],
-      [0, 0, 255],
-      [255, 71, 0],
-      [0, 235, 255],
-      [0, 173, 255],
-      [31, 0, 255],
-      [11, 200, 200],
-      [255, 82, 0],
-      [0, 255, 245],
-      [0, 61, 255],
-      [0, 255, 112],
-      [0, 255, 133],
-      [255, 0, 0],
-      [255, 163, 0],
-      [255, 102, 0],
-      [194, 255, 0],
-      [0, 143, 255],
-      [51, 255, 0],
-      [0, 82, 255],
-      [0, 255, 41],
-      [0, 255, 173],
-      [10, 0, 255],
-      [173, 255, 0],
-      [0, 255, 153],
-      [255, 92, 0],
-      [255, 0, 255],
-      [255, 0, 245],
-      [255, 0, 102],
-      [255, 173, 0],
-      [255, 0, 20],
-      [255, 184, 184],
-      [0, 31, 255],
-      [0, 255, 61],
-      [0, 71, 255],
-      [255, 0, 204],
-      [0, 255, 194],
-      [0, 255, 82],
-      [0, 10, 255],
-      [0, 112, 255],
-      [51, 0, 255],
-      [0, 194, 255],
-      [0, 122, 255],
-      [0, 255, 163],
-      [255, 153, 0],
-      [0, 255, 10],
-      [255, 112, 0],
-      [143, 255, 0],
-      [82, 0, 255],
-      [163, 255, 0],
-      [255, 235, 0],
-      [8, 184, 170],
-      [133, 0, 255],
-      [0, 255, 92],
-      [184, 0, 255],
-      [255, 0, 31],
-      [0, 184, 255],
-      [0, 214, 255],
-      [255, 0, 112],
-      [92, 255, 0],
-      [0, 224, 255],
-      [112, 224, 255],
-      [70, 184, 160],
-      [163, 0, 255],
-      [153, 0, 255],
-      [71, 255, 0],
-      [255, 0, 163],
-      [255, 204, 0],
-      [255, 0, 143],
-      [0, 255, 235],
-      [133, 255, 0],
-      [255, 0, 235],
-      [245, 0, 255],
-      [255, 0, 122],
-      [255, 245, 0],
-      [10, 190, 212],
-      [214, 255, 0],
-      [0, 204, 255],
-      [20, 0, 255],
-      [255, 255, 0],
-      [0, 153, 255],
-      [0, 41, 255],
-      [0, 255, 204],
-      [41, 0, 255],
-      [41, 255, 0],
-      [173, 0, 255],
-      [0, 245, 255],
-      [71, 0, 255],
-      [122, 0, 255],
-      [0, 255, 184],
-      [0, 92, 255],
-      [184, 255, 0],
-      [0, 133, 255],
-      [255, 214, 0],
-      [25, 194, 194],
-      [102, 255, 0],
-      [92, 0, 255]
-    ])
-
-    # visualize
-    visual_anno = np.zeros((anno.shape[0], anno.shape[1], 3), dtype=np.uint8)
-    for i in range(visual_anno.shape[0]):  # i for h
-        for j in range(visual_anno.shape[1]):
-            color = label2color_array[anno[i, j],:]
-            color = color.reshape((3,))
-            # print(color.shape,color)
-            visual_anno[i, j, 0] = color[0]
-            visual_anno[i, j, 1] = color[1]
-            visual_anno[i, j, 2] = color[2]
-
-    return visual_anno
+import tensorflow.experimental.numpy as tnp
 
 
+# ------------------------------------------------------------------------------
+# GlobalParameters
+SIZE = (384, 512)
+BATCH_SIZE = 2 
 
-if __name__ == '__main__':
-    size = (320,320)
+classes = [
+    'background', 'aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
+    'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike',
+    'person', 'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor'
+]
+# Ground Truth with RGB color for each class
+colormap = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0], [0, 0, 128],
+            [128, 0, 128], [0, 128, 128], [128, 128, 128], [64, 0, 0],
+            [192, 0, 0], [64, 128, 0], [192, 128, 0], [64, 0, 128],
+            [192, 0, 128], [64, 128, 128], [192, 128, 128], [0, 64, 0],
+            [128, 64, 0], [0, 192, 0], [128, 192, 0], [0, 64, 128]]
+
+colormap = [(item[0] * 256 + item[1]) * 256 + item[2]
+            for item in colormap]  #将RGB数组转换为十进制
+label_matrix = np.zeros(256**3, dtype='int8')
+
+# 标签映射  用数组空间去做一个映射，通过RGB十进制作为index进行访问，得到对应的label
+for index, item in enumerate(colormap):
+    label_matrix[item] = index
+
+data_dir = "E:\\Dataset\\VOCdevkit\\VOC2012\\JPEGImages\\"
+mask_dir = "E:\\Dataset\\VOCdevkit\\VOC2012\\SegmentationClass\\"
+
+# ------------------------------------------------------------------------------
+
+def mask_to_label(ground_truth):
+
+    ground_truth = np.reshape(ground_truth, (-1, 3)).astype('int32')        # height*width*channels ->  n*channels
+
+    label = np.zeros((384*512,1), dtype='int8')
+ 
+    for i in range(label.shape[0]):
+        index = (ground_truth[i,0]*256 + ground_truth[i,1])*256 + ground_truth[i,2]
+        label[i] = label_matrix[index]
+        
+    label = tf.reshape(label,(384,512,1))
+    return label
+
+
+def load_image(img_path, size=SIZE, mode="data"):
+
+    #读取图片
+    image = tf.io.read_file(img_path)
+
+    # image = tf.io.decode_image(image,expand_animations=False)
+    # 上面的代码替换成下面的两组语句
+    if mode == "data":
+        image = tf.io.decode_jpeg(image)
+    elif mode == "label":
+        image = tf.io.decode_png(image)
+    '''
+    # tf.image.decode_png 等返回的 tensor 是有静态 shape的,
+    # tf.image.decode_image 由于使用了 tf.cond 判断图片类型,因此返回的 tensor 没有静态 shape，
+    # 造成它解码的图片无法与tf.image.resize_images() 一起使用.
+    '''
+
+    # if image.shape[1] == 500:      # width >= height
+    #     pass
+    # elif image.shape[0] == 500:
+    #     image = tf.image.rot90(image)
+    # if image.shape[1]>=image.shape[0]:
+    #     pass
+    # else:
+    #     image = tf.image.rot90(image)
+
+    '''
+    对于annotation的缩放方式必须使用"nearest"
+    因为annotation标记了每个像素的确切分类，是整数值
+    如果使用"bilinear"缩放，会使缩放结果出现很多本来没有的值
+    对image的缩放则应该使用"bilinear"或其他
+    '''
+    if mode == "data":
+        image = tf.image.resize(image, size=size, method='bilinear')
+        image = tf.cast(image, dtype='float32') / 255.0
+        image = tf.reshape(image,(384,512,3))
+
+    elif mode == "label":
+        image = tf.image.resize(image, size=size, method='nearest')
+        image = image.numpy()
+        # image = tf.py_function(mask_to_label,inp=image,Tout=[tf.int8])
+        image = mask_to_label(image)
+
+    return image
+
+
+def generate_dataset(pic_name):
+
+    data_full_path = tf.strings.join([data_dir, pic_name, '.jpg'])
+    '''
+    注意  tf.py_function包装完之后返回值会多一个维度, 即把原来的返回值外面多包了一层壳
     
-    # ds_train = ADE20kDataset(size=(256, 320), batch_size=1).generate_dataset(
-    #     root="E:\\Dataset\\ADEChallengeData2016", split='train')
+    '''
+    # data = load_image(data_full_path, mode="data")
+    data = tf.py_function(load_image,inp=[data_full_path,SIZE,"data"],Tout = [tf.float32])
+    data = tf.squeeze(data,axis=0)
 
-    # ds_valid = ADE20kDataset(size=(256, 320), batch_size=1).generate_dataset(
-    #     root="E:\\Dataset\\ADEChallengeData2016", split='validation')
+    mask_full_path = tf.strings.join([mask_dir, pic_name, '.png'])
+    # label = load_image(mask_full_path, mode="label")
+    label = tf.py_function(load_image,inp=[mask_full_path, SIZE, "label"],Tout=[tf.int8])
+    label = tf.squeeze(label,axis=0)  #或者在mask_to_label用reshape,再用tf.squeeze删掉多生成的那个维度
 
-    ds_train = PascalContextDataset(
-        size=(320,320), split='validation', batch_size=1).generate_dataset(
-            'E:\\Dataset\\PascalContext\\train.txt')
-    ds_valid = PascalContextDataset(
-        size=(320,320), split='validation', batch_size=1).generate_dataset(
-            'E:\\Dataset\\PascalContext\\validation.txt')
-
+    return (data,label)
 
 
-
-    model = tf.keras.models.load_model(
-        "D:\Python\\val_miou_best.h5",compile=False)
-    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy',UpdatedMeanIoU(num_classes=151)])
+if __name__ == "__main__":
+    print(tf.__version__)
     
+    train_data_dir = "E:\\Dataset\\VOCdevkit\\VOC2012\\ImageSets\\Segmentation\\train.txt"
+    train_data = tf.data.TextLineDataset("E:\\Dataset\\VOCdevkit\\VOC2012\\ImageSets\\Segmentation\\train.txt")\
+                        .map(generate_dataset, num_parallel_calls=tf.data.experimental.AUTOTUNE) \
+                        .shuffle(buffer_size=32).batch(1) \
+                        .prefetch(tf.data.experimental.AUTOTUNE)
 
-    # model.summary()
+    tf.print(train_data)
 
-    # print("\neffb0_glore result\n")
-    # model.evaluate(ds_valid)
-    # model.evaluate(ds_train)
+    # for data,label in train_data.take(1):
+    #     tf.print(data.shape)  
+    #     tf.print(label.shape) 
+    #     cv2.imshow('data',data.numpy()[0,:,:])
+    #     cv2.imshow('label',label.numpy()[0,:,:])
+    #     cv2.waitKey(0)
+    #     break
 
-    # exit()
+    # data, label = generate_dataset("2010_002532")
+    # tf.print(data.shape)
+    # tf.print(label.shape)
 
-    model2 = tf.keras.models.load_model(
-        "D:\Python\毕业设计\\result\\0512_1251_pascal_bs8_320_320_res101tgn_node128\\val_miou_best.h5",compile=False)
-    model2.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy',UpdatedMeanIoU(num_classes=151)])
-    
-    # model3 = tf.keras.models.load_model(
-    #     "D:\Python\毕业设计\\result\\0513_1854_pascal_bs8_320_320_res101tgn_node256\\val_miou_best.h5",compile=False)
-    # model3.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy',UpdatedMeanIoU(num_classes=151)])
-    
-    # model.summary()
-
-    # print("\neffb0_glore result\n")
-    # model.evaluate(ds_valid)
-    # model.evaluate(ds_train)
-
-
-    image = tf.io.read_file("E:\\Dataset\\PascalContext\\JPEGImages\\2008_000790.jpg")
-    # image = tf.io.read_file('E:\Dataset\ADEChallengeData2016\images\\training\ADE_train_00017185.jpg')
-    image = tf.io.decode_jpeg(image)
-    image = tf.image.resize(image, size=size, method='bilinear')
-    image = tf.cast(image, dtype='float32') / 255.0
-    image = tf.reshape(image,[1,320,320,3])
-
-    annotation = tf.io.read_file("E:\\Dataset\\PascalContext\\SegmentationClass\\2008_000790.png")
-    # annotation = tf.io.read_file('E:\Dataset\ADEChallengeData2016\\annotations\\training\ADE_train_00017185.png')
-    annotation = tf.io.decode_png(annotation)
-    annotation = tf.image.resize(annotation, size=size, method='nearest')
-    annotation = tf.cast(annotation, dtype='uint8')
-
-    predict = model.predict(image,batch_size=1)
-    predict = tf.argmax(predict,axis=-1)
-    predict = tf.transpose(predict,perm=[1,2,0])
-    predict = predict.numpy().astype('uint8')
-
-    predict2 = model2.predict(image,batch_size=1)
-    predict2 = tf.argmax(predict2,axis=-1)
-    predict2 = tf.transpose(predict2,perm=[1,2,0])
-    predict2 = predict2.numpy().astype('uint8')
-
-    # predict3 = model3.predict(image,batch_size=1)
-    # predict3 = tf.argmax(predict3,axis=-1)
-    # predict3 = tf.transpose(predict3,perm=[1,2,0])
-    # predict3 = predict3.numpy().astype('uint8')
-
-
-    image = cv2.cvtColor(image.numpy().reshape([320,320,3]), cv2.COLOR_RGB2BGR)
-    cv2.imshow('image',image)
-    cv2.waitKey(0)
-    cv2.imshow('annotation',create_visual_annotation(annotation.numpy()))
-    cv2.waitKey(0)
-    cv2.imshow('effb5',create_visual_annotation(predict))
-    cv2.waitKey(0)
-    cv2.imshow('res101',create_visual_annotation(predict2))
-    cv2.waitKey(0)
-    # cv2.imshow('tgn256',create_visual_annotation(predict3))
-    # cv2.waitKey(0)
-
-    # cv2.imwrite('image.jpg',image*255)
-    # cv2.imwrite('annotation.png',create_visual_annotation(annotation.numpy()))
-    # cv2.imwrite('glore.png',create_visual_annotation(predict))
-    # cv2.imwrite('tgn_128.png',create_visual_annotation(predict2))
-    # cv2.imwrite('tgn_256.png',create_visual_annotation(predict3))
+    model = FCN8s(21)
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=[tf.keras.metrics.MeanIoU(num_classes=21)])
+    model.fit(train_data,epochs=1)
