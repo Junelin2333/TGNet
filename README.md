@@ -6,10 +6,9 @@
 <img width="80%" height="80%" align=center src="https://github.com/Junelin2333/TGNet/blob/main/misc/TGModule.png" alt="Figure 1: TGMoudle" />
 
 ### TGNet
-<img width="50%" height="50%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/TGN.png" alt="Figure 2: TGNet" align=center />
+<img width="60%" height="60%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/TGN.png" alt="Figure 2: TGNet" align=center />
 
-### GloRe-Net(as baseline)
- only use for comparing with our method 
+### GloRe-Net(as baseline, only use for comparing with our method)
 <img width="50%" height="50%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/GloRe-Net.png" alt="Figure 3: GloRe-Net" align=center />
 
 ## Enviroment
