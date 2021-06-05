@@ -23,6 +23,10 @@ Image Semantic Segmentation Based on Graph Convolution Nerual Network
 - tensorflow-addons latest version
 - and so on ...
 
+## Training
+
+run train.py and remenber to change the parsers
+
 ## Result
 
 ### Result on ADE20k Dataset
