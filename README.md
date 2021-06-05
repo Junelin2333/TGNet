@@ -28,19 +28,24 @@ Image Semantic Segmentation Based on Graph Convolution Nerual Network
 ### Result on ADE20k Dataset
 
 #### visulizaiton
+
 <img width="60%" height="60%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/%E6%88%AA%E5%B1%8F2021-06-05%2012.38.06.png" alt="Figure 4" align=center />
 
 #### Metrics
+
 <img width="80%" height="80%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/%E6%88%AA%E5%B1%8F2021-06-05%2012.38.49.png" alt="Figure 5" align=center />
 
 
 ### Result on Pascal Context Dataset
 
 #### visulizaiton
+
 <img width="60%" height="60%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/%E6%88%AA%E5%B1%8F2021-06-05%2012.39.04.png" alt="Figure 6" align=center />
 
 #### Metrics
+
 <img width="80%" height="80%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/%E6%88%AA%E5%B1%8F2021-06-05%2012.39.22.png" alt="Figure 7" align=center />
 
 ### Addon Result: Numbers of Node and Different Backbone
+
 <img width="80%" height="80%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/%E6%88%AA%E5%B1%8F2021-06-05%2012.39.48.png" alt="Figure 8" align=center />
