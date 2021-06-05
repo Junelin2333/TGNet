@@ -9,7 +9,7 @@
 <img width="50%" height="50%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/TGN.png" alt="Figure 2: TGNet" align=center />
 
 ### GloRe-Net(as baseline)
-only use for comparing with our method
+ only use for comparing with our method 
 <img width="50%" height="50%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/GloRe-Net.png" alt="Figure 3: GloRe-Net" align=center />
 
 ## Enviroment
