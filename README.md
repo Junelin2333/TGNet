@@ -11,7 +11,7 @@
 ### GloRe-Net(as baseline)
 only use for comparing with our method
 
-<img width="80%" height="80%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/GloRe-Net.png" alt="Figure 1: GloRe-Net" align=center />
+<img width="86%" height="60%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/GloRe-Net.png" alt="Figure 1: GloRe-Net" align=center />
 
 ## Enviroment
 
