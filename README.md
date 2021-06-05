@@ -1,4 +1,5 @@
-# TGNet: Image Semantic Segmentation Based on Graph Convolution Nerual Network
+# TGNet  
+Image Semantic Segmentation Based on Graph Convolution Nerual Network
 
 ## TGNet and TGModule(A GCN Module, based on GloRe)
 
@@ -16,8 +17,24 @@
 - Tensorflow 2.3
 - Python 3.8.5
 - CUDA 10.1
-- tensorflow-addons latest
+- tensorflow-addons latest version
 - and so on ...
 
 ## Result
 
+### Result on ADE20k Dataset
+
+- visulizaiton
+<img width="80%" height="80%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/%E6%88%AA%E5%B1%8F2021-06-05%2012.38.06.png" alt="Figure 4" align=center />
+- Metrics
+<img width="80%" height="80%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/%E6%88%AA%E5%B1%8F2021-06-05%2012.38.49.png" alt="Figure 5" align=center />
+
+
+### Result on Pascal Context Dataset
+- visulizaiton
+<img width="80%" height="80%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/%E6%88%AA%E5%B1%8F2021-06-05%2012.39.04.png" alt="Figure 6" align=center />
+- Metrics
+<img width="80%" height="80%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/%E6%88%AA%E5%B1%8F2021-06-05%2012.39.22.png" alt="Figure 7" align=center />
+
+### Addon Result: Numbers of Node and Different Backbone
+<img width="80%" height="80%" src="https://github.com/Junelin2333/TGNet/blob/main/misc/%E6%88%AA%E5%B1%8F2021-06-05%2012.39.48.png" alt="Figure 8" align=center />
